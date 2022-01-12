@@ -56,6 +56,53 @@ def crear_poducto():
     return resultado
 
 
+@app.route('/productos/consultar-productos', methods=['GET'])
+def consultar_productos():
+    query     = Producto.query.all()
+    productos = productos_schema.dump(query)
+    resultado = jsonify(productos)
+
+    return resultado
+
+
+@app.route('/productos/consultar-productos/<id>', methods=['GET'])
+def consultar_producto_x_id(id):
+    producto = Producto.query.get(id)
+    resultado = producto_schema.jsonify(producto)
+    
+    return resultado
+
+
+@app.route('/productos/actualizar-producto/<id>', methods=['PUT'])
+def actualizar_producto(id):
+    producto_actualizar = Producto.query.get(id)
+
+    nombre   = request.json['nombre']
+    precio   = request.json['precio']
+    cantidad = request.json['cantidad']
+
+    producto_actualizar.nombre   = nombre
+    producto_actualizar.precio   = precio
+    producto_actualizar.cantidad = cantidad
+
+    db.session.commit()
+
+    resultado = jsonify({'mensaje':'producto actualizado correctamente'}) 
+
+    return resultado
+
+
+@app.route('/productos/eliminar-producto/<id>', methods=['DELETE'])
+def eliminar_producto(id):
+    producto_eliminar = Producto.query.get(id)
+    db.session.delete(producto_eliminar)
+    db.session.commit()
+
+    resultado = jsonify({'mensaje':'producto eliminado correctamente'}) 
+
+    return resultado
+
+
 if __name__ == '__main__':
     PORT = 5000
     app.run(debug=True, port=PORT)
